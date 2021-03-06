@@ -26,7 +26,6 @@ export default function Chessboard({ board, children, ...restProps }) {
                     <Chessboard.Row key={rowIdx}>
                         {row.map((square, colIdx) => {
                             const coordinate = pointToSquareNotation(colIdx, rowIdx)
-                            console.log(coordinate);
                             return <Chessboard.Square coordinate={coordinate} {...restProps} square={square} key={colIdx}></Chessboard.Square>
                         })}
                     </Chessboard.Row>
@@ -39,9 +38,7 @@ export default function Chessboard({ board, children, ...restProps }) {
 Chessboard.Container = function ChessBoard({ children, ...restProps }) {
     return (
         <Container>
-            {/* <Inner> */}
             {children}
-            {/* </Inner> */}
         </Container>
     )
 }
@@ -51,7 +48,7 @@ Chessboard.Row = function ChessRow({ children, ...restProps }) {
 Chessboard.Square = function ChessSquare({ square, handleClick, coordinate, ...restProps }) {
     const src = getSVG(square);
     return (
-        <Square src={src} onClick={() => handleClick(square, coordinate)} {...restProps}></Square>
+        <Square src={src} onClick={() => handleClick(coordinate)} {...restProps}></Square>
     )
 
 }
@@ -59,21 +56,21 @@ Chessboard.Square = function ChessSquare({ square, handleClick, coordinate, ...r
 function pointToSquareNotation(x, y) {
     const coordinate = { col: x, row: 7 - y };
     if (x === 0) {
-        return "a" + (7 - y);
+        return "a" + (8 - y);
     } else if (x === 1) {
-        return "b" + (7 - y);
+        return "b" + (8 - y);
     } else if (x === 2) {
-        return "c" + (7 - y);
+        return "c" + (8 - y);
     } else if (x === 3) {
-        return "d" + (7 - y);
+        return "d" + (8 - y);
     } else if (x === 4) {
-        return "e" + (7 - y);
+        return "e" + (8 - y);
     } else if (x === 5) {
-        return "f" + (7 - y);
+        return "f" + (8 - y);
     } else if (x === 6) {
-        return "g" + (7 - y);
+        return "g" + (8 - y);
     } else {
-        return "h" + (7 - y);
+        return "h" + (8 - y);
     }
 
 }
