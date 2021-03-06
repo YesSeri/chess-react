@@ -1,0 +1,15 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "A server for react-chess",
+  "main": "server.js",
+  "author": "Henrik Zenkert",
+  "license": "MIT",
+  "dependencies": {
+    "nodemon": "^2.0.7",
+    "websocket": "^1.0.33"
+  },
+  "scrips": {
+    "dev": "nodemon server.js"
+  }
+}
