@@ -1,13 +1,39 @@
+const express = require('express')
+const http = require('http')
 const WebSocket = require('ws');
+const path = require('path');
 
-const wss = new WebSocket.Server({ port: 5000 });
+const app = express();
 
-wss.on('connection', function connection(ws) {
-    console.log("connected");
-    ws.on('message', function incoming(message) {
-        const obj = JSON.parse(message)
+//initialize a simple http server
+const server = http.createServer(app);
 
-        ws.send(JSON.stringify({ payload: obj.count+1 }));
+//initialize the WebSocket server instance
+const wss = new WebSocket.Server({ server });
+
+wss.on('connection', (ws) => {
+    console.log('connected')
+
+    //connection is up, let's add a simple simple event
+    ws.on('message', (message) => {
+
+        //log the received message and send it back to the client
+        console.log('received: %s', message);
+        ws.send(`Hello, you sent -> ${message}`);
     });
-    // ws.send({ payload: 'sending a message' });
+
+    //send immediatly a feedback to the incoming connection    
+    ws.send('Hi there, I am a WebSocket server');
+});
+
+app.use('/static', (req, res) => {
+    express.static(path.join(__dirname, 'static'))
+})
+app.get('/test', function (req, res) {
+  res.send('Hello World!')
+})
+
+//start our server
+server.listen(process.env.PORT || 5000, () => {
+    console.log(`Server started on port ${server.address().port} :)`);
 });
