@@ -54,7 +54,6 @@ Chessboard.Square = function ChessSquare({ square, handleClick, coordinate, ...r
 }
 
 function pointToSquareNotation(x, y) {
-    const coordinate = { col: x, row: 7 - y };
     if (x === 0) {
         return "a" + (8 - y);
     } else if (x === 1) {
