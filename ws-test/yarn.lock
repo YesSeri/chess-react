@@ -339,6 +339,11 @@ setprototypeof@1.1.1:
   resolved "https://registry.yarnpkg.com/statuses/-/statuses-1.5.0.tgz#161c7dac177659fd9811f43771fa99381478628c"
   integrity sha1-Fhx9rBd2Wf2YEfQ3cfqZOBR4Yow=
 
+stockfish@^11.0.0:
+  version "11.0.0"
+  resolved "https://registry.yarnpkg.com/stockfish/-/stockfish-11.0.0.tgz#12c6b85d2978162d1acb39cb43322cc96a514ce1"
+  integrity sha512-M/+2dCK7G1FXCuM9IrmqibCXcV5sn+rwkvVCVtb5szfMfnxmC3+2Nw79d0RnTbUlWblj+wKVfVpmRqJNkM7fMA==
+
 toidentifier@1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/toidentifier/-/toidentifier-1.0.0.tgz#7e1be3470f1e77948bc43d94a3c8f4d7752ba553"
