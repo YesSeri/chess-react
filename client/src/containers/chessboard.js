@@ -9,6 +9,7 @@ export function ChessContainer() {
 	const [board, setBoard] = useState(new Chess('8/8/8/8/8/8/8/8 w - - 0 1'))
 	const [fromSquare, setFromSquare] = useState(null);
 	const [color, setColor] = useState(null);
+	const [gameover, setGameover] = useState(null);
 	useEffect(() => {
 		socket.onopen = () => {
 			const joinGameMessage = createMessage("joinedGame", null)
@@ -16,12 +17,13 @@ export function ChessContainer() {
 		};
 		socket.onmessage = ({ data }) => {
 			const { subject, metadata, payload } = JSON.parse(data);
-			// console.log(subject, metadata, payload);
+			console.log(subject, metadata, payload);
 			if (subject === 'joinedGame') {
-				console.log(payload.color)
 				setColor(payload.color);
 			} else if (subject === 'updateBoard') {
 				setBoard(new Chess(payload.fen));
+			} else if(subject === 'gameOver'){
+
 			}
 		};
 
