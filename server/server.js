@@ -6,7 +6,13 @@ const { Chess } = require('chess.js')
 const TEAM_SIZE = 1;
 
 const app = express();
-
+const getEngineMove = require('./chessEngine');
+async function testEngine() {
+  const c = new Chess();
+  const m = await getEngineMove(c.fen(), 20);
+  console.log(m);
+}
+testEngine()
 //initialize a simple http server
 const server = http.createServer(app);
 
