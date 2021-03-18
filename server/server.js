@@ -24,7 +24,7 @@ class Room {
   constructor() {
     this.black = [];
     this.white = [];
-    this.chess = new Chess('rnbqkbnr/ppppp2p/5p2/6p1/4P3/3P4/PPP2PPP/RNBQKBNR w KQkq - 0 3');
+    this.board = new Chess();
   }
   addPlayer(ws) {
     if (this.white.length > this.black.length) {
@@ -85,17 +85,18 @@ wss.on('connection', (ws) => {
 
     if (subject === 'moveMade') {
       const room = rooms[ws.player.roomId];
-      const move = room.chess.move(payload.move)
+      const move = room.board.move(payload.move)
       if (move) {
+        const moves = getMoves(room.board);
         for (const ws of room) {
-          const updateBoardMessage = createMessage('updateBoard', { fen: room.chess.fen() })
+          const updateBoardMessage = createMessage('updateBoard', { fen: room.board.fen() })
           ws.send(updateBoardMessage);
         }
       }
-      if (room.chess.game_over()) {
+      if (room.board.game_over()) {
         console.log("GAME OVER")
         for (const ws of room) {
-          const updateBoardMessage = createMessage('gameOver', { winner: room.chess.turn() })
+          const updateBoardMessage = createMessage('gameOver', { winner: room.board.turn() })
           ws.send(updateBoardMessage);
         }
       }
@@ -110,6 +111,11 @@ wss.on('connection', (ws) => {
     // removeFromTeam(ws)
   });
 });
+function getMoves(board) {
+  const bestMove = getEngineMove(board)
+  const okayMove = getEngineMove(board, 3)
+  const randomMove = getRandomMove(board);
+}
 
 function setRoomIdForPlayers(id) {
   const room = rooms[id]
@@ -121,7 +127,7 @@ function startGame(id) {
   const room = rooms[id]
   for (const ws of room) {
     const joinGameMessage = createMessage('joinedGame', { color: ws.player.color })
-    const updateBoardMessage = createMessage('updateBoard', { fen: room.chess.fen() })
+    const updateBoardMessage = createMessage('updateBoard', { fen: room.board.fen() })
     ws.send(joinGameMessage);
     ws.send(updateBoardMessage);
   }

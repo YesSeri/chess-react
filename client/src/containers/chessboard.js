@@ -9,7 +9,7 @@ export function ChessContainer() {
 	const [board, setBoard] = useState(new Chess('8/8/8/8/8/8/8/8 w - - 0 1'))
 	const [fromSquare, setFromSquare] = useState(null);
 	const [color, setColor] = useState(null);
-	const [gameover, setGameover] = useState(null);
+	const [gameover, setGameover] = useState(false);
 	useEffect(() => {
 		socket.onopen = () => {
 			const joinGameMessage = createMessage("joinedGame", null)
@@ -23,7 +23,7 @@ export function ChessContainer() {
 			} else if (subject === 'updateBoard') {
 				setBoard(new Chess(payload.fen));
 			} else if(subject === 'gameOver'){
-
+				setGameover(true);
 			}
 		};
 
@@ -43,7 +43,9 @@ export function ChessContainer() {
 	return (
 		<Chessboard.Container>
 			<Chessboard board={board.board()} handleClick={handleClick} />
-			{color ? <div style={{ fontSize: '50px' }}>{color}</div> : null}
+			{color ? <div style={{ fontSize: '50px' }}>Color: {color}</div> : null}
+			<div style={{ fontSize: '50px' }}>Turn: {board.turn()}</div>
+			<div style={{ fontSize: '50px' }}>Gameover: {gameover.toString()}</div>
 		</Chessboard.Container>
 	)
 }
