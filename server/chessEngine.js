@@ -40,8 +40,7 @@ function parse_move(string) {
 async function test() {
     await getEngineMove(startFEN).then(move => console.log(move))
     await quitEngine();
-
 }
-test()
+// test()
 module.exports = getEngineMove;
 // module.exports = getEngine;
