@@ -12,8 +12,6 @@ export function ChessContainer() {
 	const [gameover, setGameover] = useState(false);
 	useEffect(() => {
 		socket.onopen = () => {
-			const joinGameMessage = createMessage("joinedGame", null)
-			socket.send(joinGameMessage);
 		};
 		socket.onmessage = ({ data }) => {
 			const { subject, metadata, payload } = JSON.parse(data);

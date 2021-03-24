@@ -9,7 +9,9 @@ const p = path.join(__dirname, '..', 'stockfish_13_win_x64_avx2.exe');
 async function getEngineMove(fen, engine = startEngine(), depth = 15) {
     await engine.position(fen)
     const result = await engine.go({ depth })
-    return await parseMove(result.bestmove)
+    const color = fen.split(" ")[1]
+    const move = {color, ...parseMove(result.bestmove)}
+    return move
 }
 async function startEngine(engine) {
     if (engine.id.name === null) {
@@ -27,8 +29,8 @@ function parseMove(string) {
     const move = { from, to, promotion }
     return move;
 }
-function getEngine(path){
+function getEngine(path) {
     return new Engine(path);
 }
 
-module.exports = { getEngineMove,getEngine, startEngine, enginePath: p };
+module.exports = { getEngineMove, getEngine, startEngine, enginePath: p };

@@ -1,69 +1,35 @@
 (async () => {
 
-  const startFEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
-
   const { v4: UniqID } = require('uuid');
   const express = require('express')
   const http = require('http')
   const WebSocket = require('ws');
-  const { Chess } = require('chess.js')
   const TEAM_SIZE = 1;
 
   const app = express();
-  const { getEngineMove, quitEngine, startEngine } = require('./chessEngine');
+  const { getEngine, startEngine } = require('./chessEngine');
+  const { Room, Player } = require('./classes');
+  const { getMoves } = require('./getMoves');
   //initialize a simple http server
-  await startEngine();
+
+
+  const path = require('path');
+  const enginePath = path.join(__dirname, '..', 'stockfish_13_win_x64_avx2.exe');
+
+  const engine = getEngine(enginePath);
+  await startEngine(engine);
   const server = http.createServer(app);
 
   //initialize the WebSocket server instance
   const wss = new WebSocket.Server({ server });
   const rooms = {};
 
-  class Room {
-    constructor() {
-      this.black = [];
-      this.white = [];
-      this.board = new Chess();
-    }
-    addPlayer(ws) {
-      if (this.white.length > this.black.length) {
-        this.black.push(ws);
-        ws.player.color = 'b'
-      } else {
-        this.white.push(ws);
-        ws.player.color = 'w'
-      }
-    }
-    [Symbol.iterator]() {
-      var index = -1;
-      const arr = [...this.black, ...this.white];
-
-      return {
-        next: () => ({ value: arr[++index], done: !(index in arr) })
-      };
-    };
-  }
-  class Player {
-    constructor() {
-      this.id = UniqID();
-      this.color;
-      this.roomId;
-    }
-    setRoomId(id) {
-      this.roomId = id;
-    }
-    setColor(color) {
-      this.color = color;
-    }
-  }
   let waitingPlayers = [];
 
   // Everytime I send something I should have a payload and metadata in the object sent. 
   wss.on('connection', async (ws) => {
     // Adds a unique id to each client
 
-    const move = await getEngineMove(startFEN)
-    console.log(move);
     ws.player = new Player();
     waitingPlayers.push(ws);
     // const greetMessage = createMessage('greeting', { message: 'Welcome to the server!' })
@@ -82,16 +48,20 @@
       const waitMessage = createMessage('waiting', { message: 'Waiting for other player/players to join.' })
       ws.send(waitMessage);
     }
-    ws.on('message', (message) => {
+    ws.on('message', async (message) => {
       const { subject, metadata, payload } = JSON.parse(message)
+      console.log(subject, metadata, payload, Object.keys(rooms).length);
 
       if (subject === 'moveMade') {
         const room = rooms[ws.player.roomId];
+        if (payload.move === null) {
+          return
+        }
         const move = room.board.move(payload.move)
         if (move) {
-          const moves = getMoves(room.board);
+          const threeMoves = await getMoves(room.board, engine);
           for (const ws of room) {
-            const updateBoardMessage = createMessage('updateBoard', { fen: room.board.fen() })
+            const updateBoardMessage = createMessage('updateBoard', { fen: room.board.fen(), threeMoves})
             ws.send(updateBoardMessage);
           }
         }
@@ -110,26 +80,8 @@
     });
     ws.on('close', () => {
       waitingPlayers = waitingPlayers.filter(el => el.player.id !== ws.player.id);
-      // removeFromTeam(ws)
     });
   });
-
-  async function getMoves(board) {
-    let goodMove = await getEngineMove(board.fen(), engine, 3)
-    const bestMove = await getEngineMove(board.fen(), engine)
-    if (goodMove === bestMove) {
-      goodMove = getRandomMove(board);
-    }
-    const randomMove = getRandomMove(board);
-    console.log("moves", bestMove, goodMove, randomMove);
-    return { goodMove, bestMove, randomMove }
-  }
-
-  function getRandomMove(board) {
-
-    const moves = board.moves();
-    return moves[Math.floor(Math.random() * moves.length)];
-  }
 
   function setRoomIdForPlayers(id) {
     const room = rooms[id]

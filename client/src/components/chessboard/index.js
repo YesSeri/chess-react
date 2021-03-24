@@ -37,7 +37,7 @@ export default function Chessboard({ board, children, ...restProps }) {
 
 Chessboard.Container = function ChessBoard({ children, ...restProps }) {
     return (
-        <Container>
+        <Container {...restProps}>
             {children}
         </Container>
     )
